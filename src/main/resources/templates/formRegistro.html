@@ -33,10 +33,16 @@
                                    type="password" th:field="*{password}" required/>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <label for="fechaNacimiento">Fecha de nacimiento</label>
                             <input id="fechaNacimiento" class="form-control" name="fechaNacimiento"
                                    placeholder="01-12-2019" th:field="*{fechaNacimiento}"/>
+                        </div>
+
+                        <!-- NUEVO: Checkbox condicional para Administrador -->
+                        <div class="form-group form-check mb-3" th:if="${!adminExists}">
+                            <input type="checkbox" class="form-check-input" id="admin" th:field="*{admin}"/>
+                            <label class="form-check-label" for="admin">Registrarse como Administrador</label>
                         </div>
 
                         <button type="submit" class="btn btn-primary">Registro</button>
@@ -60,7 +66,7 @@
     </div>
 </div>
 
-<div th:replace="fragments::javascript"/>
+<div th:replace="fragments::javascript"></div>
 
 </body>
 </html>

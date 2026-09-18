@@ -78,4 +78,8 @@ public class UsuarioService {
     public List<Usuario> findAll() {
         return (List<Usuario>) usuarioRepository.findAll();
     }
+
+    public boolean existsAdmin() {
+        return usuarioRepository.existsByAdmin(true);
+    }
 }

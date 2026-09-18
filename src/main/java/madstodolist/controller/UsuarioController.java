@@ -1,5 +1,7 @@
 package madstodolist.controller;
 
+import madstodolist.authentication.ManagerUserSession;
+import madstodolist.controller.exception.UnauthorizedException;
 import madstodolist.dto.UsuarioData;
 import madstodolist.model.Usuario;
 import madstodolist.service.UsuarioService;
@@ -15,29 +17,53 @@ import java.util.List;
 public class UsuarioController {
 
     @Autowired
-    private UsuarioService usuarioService; // O el nombre de tu servicio de usuarios
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private ManagerUserSession managerUserSession; // <-- Asegúrate de tenerlo inyectado
 
     @GetMapping("/registrados")
     public String listarRegistrados(Model model) {
-        // Obtenemos la lista de usuarios desde el servicio
-        List<Usuario> usuarios = usuarioService.findAll();
+// 1. Comprobamos quién está logueado
+        Long idLogeado = managerUserSession.usuarioLogeado();
+        if (idLogeado == null) {
+            return "redirect:/login"; // Si no está logueado, al login
+        }
 
-        // Los añadimos al modelo para que Thymeleaf pueda leerlos
+        UsuarioData usuarioLogeado = usuarioService.findById(idLogeado);
+
+        // 2. Validamos si es administrador
+        if (usuarioLogeado == null || !Boolean.TRUE.equals(usuarioLogeado.getAdmin())) {
+            throw new UnauthorizedException("No tienes suficientes permisos para acceder a esta página.");
+        }
+
+        // Si es admin, cargamos la vista con normalidad
+        model.addAttribute("usuario", usuarioLogeado);
+        List<Usuario> usuarios = usuarioService.findAll();
         model.addAttribute("usuarios", usuarios);
 
-        // Retorna el nombre de la vista HTML (registrados.html)
         return "registrados";
     }
 
     @GetMapping("/registrados/{id}")
     public String verDetalleUsuario(@PathVariable Long id, Model model) {
-        // Buscamos el usuario por su ID
-        UsuarioData usuario = usuarioService.findById(id);
+        Long idLogeado = managerUserSession.usuarioLogeado();
+        if (idLogeado == null) {
+            return "redirect:/login";
+        }
 
-        // Lo pasamos al modelo para que la vista pueda leer sus datos
-        model.addAttribute("usuario", usuario);
+        UsuarioData usuarioLogeado = usuarioService.findById(idLogeado);
 
-        // Retorna la vista HTML de detalle
+        // 2. Validamos si es administrador
+        if (usuarioLogeado == null || !Boolean.TRUE.equals(usuarioLogeado.getAdmin())) {
+            throw new UnauthorizedException("No tienes suficientes permisos para ver los detalles de este usuario.");
+        }
+
+        // Si es admin, cargamos los datos del usuario solicitado
+        model.addAttribute("usuario", usuarioLogeado);
+        UsuarioData usuarioDetalle = usuarioService.findById(id);
+        model.addAttribute("usuarioDetalle", usuarioDetalle);
+
         return "usuarioDetalle";
     }
 }
