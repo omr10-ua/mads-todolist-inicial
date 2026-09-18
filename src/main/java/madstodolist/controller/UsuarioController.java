@@ -66,4 +66,23 @@ public class UsuarioController {
 
         return "usuarioDetalle";
     }
+
+    @GetMapping("/registrados/{id}/bloquear")
+    public String cambiarBloqueo(@PathVariable Long id) {
+        // 1. Protección de seguridad: comprobar que quien hace la petición es admin
+        Long idLogeado = managerUserSession.usuarioLogeado();
+        if (idLogeado == null) {
+            return "redirect:/login";
+        }
+        UsuarioData usuarioLogeado = usuarioService.findById(idLogeado);
+        if (usuarioLogeado == null || !Boolean.TRUE.equals(usuarioLogeado.getAdmin())) {
+            throw new UnauthorizedException("No tienes permisos suficientes.");
+        }
+
+        // 2. Ejecutamos el cambio de bloqueo
+        usuarioService.cambiarBloqueo(id);
+
+        // 3. Redirigimos de vuelta al listado
+        return "redirect:/registrados";
+    }
 }

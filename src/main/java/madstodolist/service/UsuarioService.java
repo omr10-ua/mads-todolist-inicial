@@ -18,7 +18,8 @@ public class UsuarioService {
 
     Logger logger = LoggerFactory.getLogger(UsuarioService.class);
 
-    public enum LoginStatus {LOGIN_OK, USER_NOT_FOUND, ERROR_PASSWORD}
+    // 1. Añadimos USER_BLOCKED al enum
+    public enum LoginStatus {LOGIN_OK, USER_NOT_FOUND, ERROR_PASSWORD, USER_BLOCKED}
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -30,7 +31,12 @@ public class UsuarioService {
         Optional<Usuario> usuario = usuarioRepository.findByEmail(eMail);
         if (!usuario.isPresent()) {
             return LoginStatus.USER_NOT_FOUND;
-        } else if (!usuario.get().getPassword().equals(password)) {
+        }
+        // 2. Comprobamos si el usuario está bloqueado antes de mirar la contraseña
+        else if (Boolean.TRUE.equals(usuario.get().getBloqueado())) {
+            return LoginStatus.USER_BLOCKED;
+        }
+        else if (!usuario.get().getPassword().equals(password)) {
             return LoginStatus.ERROR_PASSWORD;
         } else {
             return LoginStatus.LOGIN_OK;
@@ -38,8 +44,6 @@ public class UsuarioService {
     }
 
     // Se añade un usuario en la aplicación.
-    // El email y password del usuario deben ser distinto de null
-    // El email no debe estar registrado en la base de datos
     @Transactional
     public UsuarioData registrar(UsuarioData usuario) {
         Optional<Usuario> usuarioBD = usuarioRepository.findByEmail(usuario.getEmail());
@@ -81,5 +85,16 @@ public class UsuarioService {
 
     public boolean existsAdmin() {
         return usuarioRepository.existsByAdmin(true);
+    }
+
+    // 3. Método nuevo para bloquear o desbloquear un usuario
+    @Transactional
+    public void cambiarBloqueo(Long id) {
+        Usuario usuario = usuarioRepository.findById(id).orElse(null);
+        if (usuario != null) {
+            // Invierte el estado actual (si era true pasa a false, y viceversa)
+            usuario.setBloqueado(!Boolean.TRUE.equals(usuario.getBloqueado()));
+            usuarioRepository.save(usuario);
+        }
     }
 }
