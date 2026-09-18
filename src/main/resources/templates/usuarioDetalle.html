@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments :: head (titulo='Detalle de Usuario')"></head>
+
+<body>
+
+<!-- Navbar superior -->
+<div th:replace="fragments :: navbar"></div>
+
+<!-- Contenido principal -->
+<div class="container" style="margin-top: 80px;">
+    <div class="row mt-3">
+        <div class="col">
+            <h2 th:text="'Detalles del usuario: ' + ${usuario.nombre}"></h2>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-6">
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <strong>ID:</strong> <span th:text="${usuario.id}"></span>
+                </li>
+                <li class="list-group-item">
+                    <strong>Nombre:</strong> <span th:text="${usuario.nombre}"></span>
+                </li>
+                <li class="list-group-item">
+                    <strong>Correo Electrónico: </strong> <span th:text="${usuario.email}"></span>
+                </li>
+                <li class="list-group-item">
+                    <strong>Fecha de nacimiento: </strong> <span th:text="${usuario.fechaNacimiento}"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Botón para volver al listado -->
+    <div class="row mt-3">
+        <div class="col">
+            <a class="btn btn-secondary" th:href="@{/registrados}">Volver al listado</a>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts de Bootstrap -->
+<div th:replace="fragments::javascript"></div>
+
+</body>
+</html>
