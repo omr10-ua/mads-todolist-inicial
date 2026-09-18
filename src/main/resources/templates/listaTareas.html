@@ -4,8 +4,8 @@
 <head th:replace="fragments :: head (titulo='Login')"></head>
 
 <body>
-<div class="container-fluid">
-
+<div class="container-fluid" style="margin-top: 80px;">
+    <div th:replace="fragments :: navbar"></div>
     <div class="row mt-3">
         <div class="col">
             <h2 th:text="'Listado de tareas de ' + ${usuario.nombre}"></h2>

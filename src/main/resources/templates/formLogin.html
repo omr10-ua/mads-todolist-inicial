@@ -4,8 +4,8 @@
 <head th:replace="fragments :: head (titulo='Login')"></head>
 
 <body>
-<div class="container-fluid">
-
+<div class="container-fluid" style="margin-top: 80px;">
+    <div th:replace="fragments :: navbar"></div>
     <div class="row justify-content-center mb-3">
         <div class="col-auto">
             <h2>Login</h2>
@@ -27,6 +27,9 @@
                         </div>
                         <button type="submit" class="btn btn-primary">Login</button>
                         <a class="btn btn-link" href="/registro">Ir a registro</a>
+                        <a class="btn btn-link" href="/about">Acerca de</a>
+                    </div>
+                </div>
             </form>
         </div>
     </div>

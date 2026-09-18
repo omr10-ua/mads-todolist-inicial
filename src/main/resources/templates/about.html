@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments :: head (titulo='Acerca de')"></head>
+
+<body>
+<div class="container-fluid" style="margin-top: 80px;">
+    <div th:replace="fragments :: navbar"></div>
+    <div class="container-fluid">
+        <h1>ToDoList</h1>
+        <ul>
+            <li>Desarrollada por Óscar Masanet Robles </li>
+            <li>Versión 1.1.0 (en desarrollo)</li>
+            <li>Fecha de release: pendiente de release</li>
+        </ul>
+    </div>
+
+</div>
+
+<div th:replace="fragments::javascript"/>
+
+</body>
+</html>
