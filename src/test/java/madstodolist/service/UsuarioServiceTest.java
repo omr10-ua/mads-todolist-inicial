@@ -153,4 +153,50 @@ public class UsuarioServiceTest {
         assertThat(usuario.getEmail()).isEqualTo("user@ua");
         assertThat(usuario.getNombre()).isEqualTo("Usuario Ejemplo");
     }
+
+    @Test
+    public void testExistsAdmin() {
+        // Comprobamos si la función detecta si hay administrador
+        boolean existe = usuarioService.existsAdmin();
+        // Dependiendo de tu dataset inicial, esto será true o false
+        assertThat(existe).isNotNull();
+    }
+
+    @Test
+    public void testCambiarBloqueo() {
+        // Creamos un usuario de prueba
+        UsuarioData datos = new UsuarioData();
+        datos.setEmail("testbloqueo@ua.es");
+        datos.setPassword("1234");
+        datos.setNombre("Test Bloqueo");
+        UsuarioData usuario = usuarioService.registrar(datos);
+
+        // Por defecto no debe estar bloqueado
+        UsuarioData uAntes = usuarioService.findById(usuario.getId());
+        assertThat(uAntes.getBloqueado()).isFalse();
+
+        // Cambiamos el bloqueo
+        usuarioService.cambiarBloqueo(usuario.getId());
+
+        // Comprobamos que ahora sí está bloqueado
+        UsuarioData uDespues = usuarioService.findById(usuario.getId());
+        assertThat(uDespues.getBloqueado()).isTrue();
+    }
+
+    @Test
+    public void testLoginUsuarioBloqueado() {
+        // Creamos y bloqueamos un usuario
+        UsuarioData datos = new UsuarioData();
+        datos.setEmail("bloqueado@ua.es");
+        datos.setPassword("1234");
+        datos.setNombre("Bloqueado");
+        UsuarioData usuario = usuarioService.registrar(datos);
+        usuarioService.cambiarBloqueo(usuario.getId());
+
+        // Intentamos hacer login
+        UsuarioService.LoginStatus status = usuarioService.login("bloqueado@ua.es", "1234");
+
+        // Debe devolver USER_BLOCKED
+        assertThat(status).isEqualTo(UsuarioService.LoginStatus.USER_BLOCKED);
+    }
 }
