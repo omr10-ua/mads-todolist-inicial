@@ -12,6 +12,9 @@ jobs:
     steps:
       # Hacemos un checkout del código del repositorio
       - uses: actions/checkout@v4
+      #Damos permiso a Maven
+      - name: Grant execute permission for Maven wrapper
+        run: chmod +x mvnw
       # Y lanzamos los tests
       - name: Launch tests with Maven
         run:  ./mvnw test
