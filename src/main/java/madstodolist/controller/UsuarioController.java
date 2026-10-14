@@ -20,11 +20,11 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @Autowired
-    private ManagerUserSession managerUserSession; // <-- Asegúrate de tenerlo inyectado
+    private ManagerUserSession managerUserSession;
 
     @GetMapping("/registrados")
     public String listarRegistrados(Model model) {
-// 1. Comprobamos quién está logueado
+        // 1. Comprobamos quién está logueado
         Long idLogeado = managerUserSession.usuarioLogeado();
         if (idLogeado == null) {
             return "redirect:/login"; // Si no está logueado, al login
