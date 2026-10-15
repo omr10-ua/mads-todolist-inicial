@@ -39,12 +39,16 @@ public class Equipo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Equipo equipo = (Equipo) o;
-        return Objects.equals(id, equipo.id) && Objects.equals(nombre, equipo.nombre);
+        if (id != null && equipo.id != null) {
+            return Objects.equals(id, equipo.id);
+        }
+
+        return Objects.equals(nombre, equipo.nombre);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id != null ? id : nombre);
     }
 
 }
