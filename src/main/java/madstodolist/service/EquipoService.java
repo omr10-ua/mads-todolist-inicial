@@ -76,6 +76,7 @@ public class EquipoService {
     public List<UsuarioData> usuariosEquipo(Long id) {
         Equipo equipo = equipoRepository.findById(id).orElse(null);
         // Hacemos uso de Java Stream API para mapear la lista de entidades a DTOs.
+        assert equipo != null;
         return equipo.getUsuarios().stream()
                 .map(usuario -> modelMapper.map(usuario, UsuarioData.class))
                 .collect(Collectors.toList());
