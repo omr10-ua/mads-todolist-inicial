@@ -1,5 +1,7 @@
 package madstodolist.dto;
 
+import java.util.Objects;
+
 public class EquipoData {
 
 
@@ -22,4 +24,21 @@ public class EquipoData {
         this.id = id;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EquipoData equipo = (EquipoData) o;
+        if (id != null && equipo.id != null)
+            // Si tenemos los ID, comparamos por ID
+            return Objects.equals(id, equipo.id);
+        // si no comparamos por campos obligatorios
+        return nombre.equals(equipo.nombre);
+    }
+
+    @Override
+    public int hashCode() {
+        // Generamos un hash basado en los campos obligatorios
+        return Objects.hash(nombre);
+    }
 }

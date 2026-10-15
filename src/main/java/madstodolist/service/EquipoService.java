@@ -32,4 +32,21 @@ public class EquipoService {
         }
         return modelMapper.map(equipo, EquipoData.class);
     }
+
+    @Transactional
+    public EquipoData crearEquipo(String nombre) {
+        Equipo equipo = equipoRepository.save(new Equipo(nombre));
+        return modelMapper.map(equipo, EquipoData.class);
+    }
+
+    @Transactional(readOnly = true)
+    public EquipoData recuperarEquipo(Long id) {
+        Equipo equipo = equipoRepository.findById(id).orElse(null);
+
+        if (equipo == null) {
+            return null;
+        }
+
+        return modelMapper.map(equipo, EquipoData.class);
+    }
 }
