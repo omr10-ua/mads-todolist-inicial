@@ -11,4 +11,5 @@ import java.util.Optional;
 @Repository
 public interface equipoRepository extends JpaRepository<Equipo, Long> {
     public List<Equipo> findAll();
+    public List<Equipo> findAllOrdenadoPorNombre();
 }
