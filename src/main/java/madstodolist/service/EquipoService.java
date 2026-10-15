@@ -82,4 +82,14 @@ public class EquipoService {
                 .collect(Collectors.toList());
 
     }
+
+    @Transactional(readOnly = true)
+    public List<EquipoData> equiposUsuario(Long usuarioId) {
+        // Usamos el método que busca equipos por ID de usuario
+        List<Equipo> equipos = equipoRepository.findByUsuariosId(usuarioId);
+
+        return equipos.stream()
+                .map(equipo -> modelMapper.map(equipo, EquipoData.class))
+                .collect(Collectors.toList());
+    }
 }

@@ -70,5 +70,4 @@ public class Equipo {
     public int hashCode() {
         return Objects.hash(id != null ? id : nombre);
     }
-
 }
