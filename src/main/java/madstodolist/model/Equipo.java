@@ -1,8 +1,15 @@
 package madstodolist.model;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "equipos")
 public class Equipo {
 
-    private final String nombre;
+    @Id
+    private String nombre;
+
+    public Equipo(){}
 
     public Equipo(String equipo) {
         nombre = equipo;
