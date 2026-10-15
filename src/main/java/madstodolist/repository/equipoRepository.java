@@ -1,9 +1,12 @@
 package madstodolist.repository;
 
 import madstodolist.model.Equipo;
+import madstodolist.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
-public interface EquipoRepository extends JpaRepository<Equipo, String> {
+public interface equipoRepository extends JpaRepository<Equipo, Long> {
 }
