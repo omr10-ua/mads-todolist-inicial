@@ -67,29 +67,25 @@ public class EquipoService {
     @Transactional(readOnly = true)
     public List<EquipoData> equiposUsuario(Long usuarioId) {
         try {
-            // 1. Controlar si el ID es nulo (por ejemplo, si no hay sesión iniciada)
             if (usuarioId == null) {
                 throw new EquipoServiceException("Usuario no encontrado");
             }
 
-            // 2. Comprobar si el usuario existe primero
             boolean usuarioExiste = usuarioRepository.existsById(usuarioId);
             if (!usuarioExiste) {
-                throw new UsuarioServiceException("Usuario no encontrado");
+                // CAMBIO AQUÍ: Lanza EquipoServiceException en lugar de UsuarioServiceException
+                throw new EquipoServiceException("Usuario no encontrado");
             }
 
-            // 3. Buscar los equipos
             List<Equipo> equipos = equipoRepository.findByUsuariosId(usuarioId);
 
             return equipos.stream()
                     .map(equipo -> modelMapper.map(equipo, EquipoData.class))
                     .collect(Collectors.toList());
 
-        } catch (EquipoServiceException | UsuarioServiceException e) {
-            // IMPORTANTE: Si ya es una excepción controlada, la relanzamos sin modificarla
+        } catch (EquipoServiceException e) {
             throw e;
         } catch (Exception e) {
-            // Solo para errores realmente inesperados de base de datos
             throw new EquipoServiceException("No se encontro el equipo");
         }
     }
