@@ -28,26 +28,15 @@ public class EquipoService {
 
     @Transactional
     public EquipoData crearEquipo(String nombre) {
-        try {
-            Equipo equipo = equipoRepository.save(new Equipo(nombre));
-            return modelMapper.map(equipo, EquipoData.class);
-        } catch (EquipoServiceException e) {
-            throw new EquipoServiceException(e.getMessage());
-        }
+        Equipo equipo = equipoRepository.save(new Equipo(nombre));
+        return modelMapper.map(equipo, EquipoData.class);
     }
 
     @Transactional(readOnly = true)
     public EquipoData recuperarEquipo(Long id) {
-        try {
-            Equipo equipo = equipoRepository.findById(id).orElse(null);
+        Equipo equipo = equipoRepository.findById(id).orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
 
-            if (equipo == null) {
-                return null;
-            }
-            return modelMapper.map(equipo, EquipoData.class);
-        } catch (EquipoServiceException e) {
-            throw new EquipoServiceException(e.getMessage());
-        }
+        return modelMapper.map(equipo, EquipoData.class);
     }
 
     @Transactional(readOnly = true)
@@ -60,43 +49,30 @@ public class EquipoService {
 
     @Transactional
     public void añadirUsuarioAEquipo(Long id, Long id1) {
-        try {
-            Equipo equipo = equipoRepository.findById(id).orElse(null);
-            Usuario usuario = usuarioRepository.findById(id1).orElse(null);
-            assert equipo != null;
-            equipo.addUsuario(usuario);
-        } catch (EquipoServiceException e) {
-            throw new EquipoServiceException(e.getMessage());
-        }
+        Equipo equipo = equipoRepository.findById(id).orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
+        Usuario usuario = usuarioRepository.findById(id1).orElseThrow(() -> new UsuarioServiceException("Usuario no encontrado"));
+        equipo.addUsuario(usuario);
     }
 
     @Transactional(readOnly = true)
     public List<UsuarioData> usuariosEquipo(Long id) {
-        try {
-            Equipo equipo = equipoRepository.findById(id).orElse(null);
-            // Hacemos uso de Java Stream API para mapear la lista de entidades a DTOs.
-            assert equipo != null;
-            return equipo.getUsuarios().stream()
-                    .map(usuario -> modelMapper.map(usuario, UsuarioData.class))
-                    .collect(Collectors.toList());
-        } catch (EquipoServiceException e) {
-            throw new EquipoServiceException(e.getMessage());
-        }
+        Equipo equipo = equipoRepository.findById(id).orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
+        // Hacemos uso de Java Stream API para mapear la lista de entidades a DTOs.
+        assert equipo != null;
+        return equipo.getUsuarios().stream()
+                .map(usuario -> modelMapper.map(usuario, UsuarioData.class))
+                .collect(Collectors.toList());
 
     }
 
     @Transactional(readOnly = true)
     public List<EquipoData> equiposUsuario(Long usuarioId) {
-        try {
-            // Usamos el método que busca equipos por ID de usuario
-            List<Equipo> equipos = equipoRepository.findByUsuariosId(usuarioId);
+        // Usamos el método que busca equipos por ID de usuario
+        List<Equipo> equipos = equipoRepository.findByUsuariosId(usuarioId);
 
-            return equipos.stream()
-                    .map(equipo -> modelMapper.map(equipo, EquipoData.class))
-                    .collect(Collectors.toList());
-        }catch (EquipoServiceException e) {
-            throw new EquipoServiceException(e.getMessage());
-        }
+        return equipos.stream()
+                .map(equipo -> modelMapper.map(equipo, EquipoData.class))
+                .collect(Collectors.toList());
     }
 
 
