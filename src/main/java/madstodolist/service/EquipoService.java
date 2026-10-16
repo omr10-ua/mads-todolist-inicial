@@ -67,21 +67,45 @@ public class EquipoService {
     @Transactional(readOnly = true)
     public List<EquipoData> equiposUsuario(Long usuarioId) {
         try {
-            // Usamos el método que busca equipos por ID de usuario
-            List<Equipo> equipos = equipoRepository.findByUsuariosId(usuarioId);
-            boolean UsuarioExiste = usuarioRepository.existsById(usuarioId);
-            if (!UsuarioExiste) {
+            // 1. Controlar si el ID es nulo (por ejemplo, si no hay sesión iniciada)
+            if (usuarioId == null) {
+                throw new EquipoServiceException("Usuario no encontrado");
+            }
+
+            // 2. Comprobar si el usuario existe primero
+            boolean usuarioExiste = usuarioRepository.existsById(usuarioId);
+            if (!usuarioExiste) {
                 throw new UsuarioServiceException("Usuario no encontrado");
             }
+
+            // 3. Buscar los equipos
+            List<Equipo> equipos = equipoRepository.findByUsuariosId(usuarioId);
 
             return equipos.stream()
                     .map(equipo -> modelMapper.map(equipo, EquipoData.class))
                     .collect(Collectors.toList());
 
-        }catch (Exception e) {
+        } catch (EquipoServiceException | UsuarioServiceException e) {
+            // IMPORTANTE: Si ya es una excepción controlada, la relanzamos sin modificarla
+            throw e;
+        } catch (Exception e) {
+            // Solo para errores realmente inesperados de base de datos
             throw new EquipoServiceException("No se encontro el equipo");
         }
     }
 
+    @Transactional
+    public void eliminarUsuarioDeEquipo(Long equipoId, Long usuarioId) {
+        // 1. Buscamos el equipo
+        Equipo equipo = equipoRepository.findById(equipoId)
+                .orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
+
+        // 2. Buscamos el usuario
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new UsuarioServiceException("Usuario no encontrado"));
+
+        // 3. Desvinculamos el usuario del equipo (dependiendo de cómo lo hayas llamado en tu entidad)
+        equipo.getUsuarios().remove(usuario);
+    }
 
 }

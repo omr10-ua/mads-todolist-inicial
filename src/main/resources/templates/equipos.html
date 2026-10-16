@@ -10,7 +10,7 @@
 <div class="container" style="margin-top: 80px;">
     <h2>Listado de Equipos</h2>
 
-    <!-- Tabla para mostrar los equipos que pasas desde el controlador -->
+    <!-- Tabla para mostrar los equipos -->
     <table class="table table-striped mt-3">
         <thead>
         <tr>
@@ -19,16 +19,21 @@
         </tr>
         </thead>
         <tbody>
-        <!-- Recorremos la lista de equipos -->
         <tr th:each="equipo : ${equipos}">
             <td th:text="${equipo.nombre}">Nombre del equipo</td>
             <td>
-                <!-- Enlace al detalle del equipo -->
+                <!-- Enlace al detalle -->
                 <a th:href="@{/equipos/{id}(id=${equipo.id})}" class="btn btn-sm btn-primary">Detalle</a>
+
+                <!-- Si el usuario NO está en el equipo, mostramos botón de unirse -->
+                <a th:href="@{/equipos/{id}/unirse(id=${equipo.id})}" th:if="${!idsEquiposDelUsuario.contains(equipo.id)}" class="btn btn-sm btn-success">Unirme</a>
+
+                <a th:href="@{/equipos/{id}/salir(id=${equipo.id})}" th:if="${idsEquiposDelUsuario.contains(equipo.id)}" class="btn btn-sm btn-danger">Salir</a>
             </td>
         </tr>
         </tbody>
     </table>
+
     <a th:href="@{/nuevoEquipo}" class="btn btn-success">Nuevo equipo</a>
 </div>
 

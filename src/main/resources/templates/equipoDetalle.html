@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments :: head (titulo='Detalle del Equipo')"></head>
+
+<body>
+<!-- Navbar -->
+<div th:replace="fragments :: navbar"></div>
+
+<div class="container" style="margin-top: 80px;">
+    <!-- Mostramos el nombre del equipo -->
+    <h2 th:text="${equipo.nombre}">Nombre del Equipo</h2>
+    <hr>
+
+    <h3>Usuarios del equipo</h3>
+
+    <!-- Tabla con los usuarios del equipo -->
+    <table class="table table-striped mt-3">
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="usuario : ${usuarios}">
+            <td th:text="${usuario.nombre}">Nombre usuario</td>
+            <td th:text="${usuario.email}">Email usuario</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Botón para volver a la lista de equipos -->
+    <a th:href="@{/equipos}" class="btn btn-secondary mt-3">Volver a equipos</a>
+</div>
+
+</body>
+</html>
