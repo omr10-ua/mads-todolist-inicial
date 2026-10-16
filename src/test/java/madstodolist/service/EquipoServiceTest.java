@@ -113,4 +113,51 @@ public class EquipoServiceTest {
         assertThatThrownBy(() -> equipoService.añadirUsuarioAEquipo(equipo.getId(), 1L))
                 .isInstanceOf(EquipoServiceException.class);
     }
+
+    @Test
+    public void testModificarNombreEquipo() {
+        // Usuario 1 (admin) modifica el equipo con ID 1
+        equipoService.modificarNombreEquipo(1L, 1L, "Nuevo Nombre Empresa");
+
+        EquipoData equipo = equipoService.recuperarEquipo(1L);
+        assertThat(equipo.getNombre()).isEqualTo("Nuevo Nombre Empresa");
+    }
+
+    @Test
+    public void testModificarNombreEquipoNoEncontrado() {
+        // Usuario 1 (admin) intenta modificar un equipo que no existe (999L)
+        assertThatThrownBy(() -> equipoService.modificarNombreEquipo(1L, 999L, "Nombre"))
+                .isInstanceOf(EquipoServiceException.class);
+    }
+
+    @Test
+    public void testEliminarEquipo() {
+        // Suponemos que el usuario con ID 1 es administrador y el equipo con ID 2 existe
+        equipoService.eliminarEquipo(1L, 2L);
+
+        // Como tu método recuperarEquipo lanza una excepción cuando no lo encuentra (orElseThrow):
+        assertThatThrownBy(() -> equipoService.recuperarEquipo(2L))
+                .isInstanceOf(EquipoServiceException.class);
+    }
+
+    @Test
+    public void testEliminarEquipoNoEncontrado() {
+        // Si intentamos borrar un equipo que no existe (ej. ID 999L) con un admin válido (ID 1L)
+        assertThatThrownBy(() -> equipoService.eliminarEquipo(1L, 999L))
+                .isInstanceOf(EquipoServiceException.class);
+    }
+
+    @Test
+    public void testModificarNombreEquipoNoAdmin() {
+        // Suponiendo que el usuario con ID 2 es un usuario normal (admin = false)
+        assertThatThrownBy(() -> equipoService.modificarNombreEquipo(2L, 1L, "Nuevo Nombre"))
+                .isInstanceOf(EquipoServiceException.class);
+    }
+
+    @Test
+    public void testEliminarEquipoNoAdmin() {
+        // Usuario normal intentando eliminar un equipo
+        assertThatThrownBy(() -> equipoService.eliminarEquipo(2L, 1L))
+                .isInstanceOf(EquipoServiceException.class);
+    }
 }
