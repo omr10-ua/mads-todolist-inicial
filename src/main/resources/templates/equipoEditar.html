@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments :: head (titulo='Editar Equipo')"></head>
+
+<body>
+<div th:replace="fragments :: navbar"></div>
+
+<div class="container" style="margin-top: 80px;">
+    <h2>Editar equipo</h2>
+
+    <form action="#" th:action="@{/equipos/{id}/editar(id=${equipo.id})}" th:object="${equipo}" method="post" class="mt-4">
+
+        <div class="form-group mb-3">
+            <label for="nombre">Nombre del equipo</label>
+            <input type="text" id="nombre" th:field="*{nombre}" class="form-control" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <a th:href="@{/equipos}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
+</body>
+</html>

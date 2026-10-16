@@ -97,4 +97,9 @@ public class UsuarioService {
             usuarioRepository.save(usuario);
         }
     }
+
+    @Transactional(readOnly = true)
+    public Usuario recuperarUsuario(Long id) {
+        return usuarioRepository.findById(id).orElse(null);
+    }
 }
