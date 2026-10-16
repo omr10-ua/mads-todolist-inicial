@@ -28,8 +28,12 @@ public class EquipoService {
 
     @Transactional
     public EquipoData crearEquipo(String nombre) {
-        Equipo equipo = equipoRepository.save(new Equipo(nombre));
-        return modelMapper.map(equipo, EquipoData.class);
+        try {
+            Equipo equipo = equipoRepository.save(new Equipo(nombre));
+            return modelMapper.map(equipo, EquipoData.class);
+        } catch (EquipoServiceException e) {
+            throw new EquipoServiceException(e.getMessage());
+        }
     }
 
     @Transactional(readOnly = true)
