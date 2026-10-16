@@ -25,10 +25,14 @@
                 <!-- Enlace al detalle -->
                 <a th:href="@{/equipos/{id}(id=${equipo.id})}" class="btn btn-sm btn-primary">Detalle</a>
 
-                <!-- Si el usuario NO está en el equipo, mostramos botón de unirse -->
                 <a th:href="@{/equipos/{id}/unirse(id=${equipo.id})}" th:if="${!idsEquiposDelUsuario.contains(equipo.id)}" class="btn btn-sm btn-success">Unirme</a>
 
                 <a th:href="@{/equipos/{id}/salir(id=${equipo.id})}" th:if="${idsEquiposDelUsuario.contains(equipo.id)}" class="btn btn-sm btn-danger">Salir</a>
+
+                <span th:if="${esAdmin}">
+            <a th:href="@{/equipos/{id}/editar(id=${equipo.id})}" class="btn btn-sm btn-warning">Editar</a>
+            <a th:href="@{/equipos/{id}/eliminar(id=${equipo.id})}" class="btn btn-sm btn-dark" onclick="return confirm('¿Estás seguro de eliminar este equipo?');">Eliminar</a>
+        </span>
             </td>
         </tr>
         </tbody>

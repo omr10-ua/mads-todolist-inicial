@@ -4,6 +4,8 @@ import madstodolist.authentication.ManagerUserSession;
 import madstodolist.dto.EquipoData;
 import madstodolist.dto.UsuarioData;
 import madstodolist.model.Equipo;
+import madstodolist.model.Usuario;
+import madstodolist.repository.UsuarioRepository;
 import madstodolist.service.EquipoService;
 import madstodolist.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,20 +27,23 @@ public class EquipoController {
     private EquipoService equipoService;
 
     @Autowired
-    UsuarioService usuarioService;
+    ManagerUserSession managerUserSession;
 
     @Autowired
-    ManagerUserSession managerUserSession;
+    private UsuarioService usuarioService;
 
     @GetMapping("/equipos")
     public String listarEquipos(Model model) {
         Long usuarioId = managerUserSession.usuarioLogeado();
-
-        // Si no hay usuario logueado, lo mandamos al login
         if (usuarioId == null) {
             return "redirect:/login";
         }
 
+        // 1. Recuperamos la entidad Usuario (en lugar de UsuarioData)
+        Usuario usuario = usuarioService.recuperarUsuario(usuarioId);
+        boolean esAdmin = usuario != null && usuario.getAdmin() != null && usuario.getAdmin();
+
+        // 2. Resto de datos habituales
         List<EquipoData> equipos = equipoService.findAllOrdenadoPorNombre();
         List<EquipoData> equiposDelUsuario = equipoService.equiposUsuario(usuarioId);
 
@@ -48,6 +53,7 @@ public class EquipoController {
 
         model.addAttribute("equipos", equipos);
         model.addAttribute("idsEquiposDelUsuario", idsEquiposDelUsuario);
+        model.addAttribute("esAdmin", esAdmin);
 
         return "equipos";
     }
@@ -102,6 +108,50 @@ public class EquipoController {
 
         // Método equivalente en tu servicio para eliminar al usuario del equipo
         equipoService.eliminarUsuarioDeEquipo(id, usuarioId);
+        return "redirect:/equipos";
+    }
+
+    @GetMapping("/equipos/{id}/editar")
+    public String editarEquipoForm(@PathVariable Long id, Model model, RedirectAttributes flash) {
+        Long usuarioId = managerUserSession.usuarioLogeado();
+        if (usuarioId == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            EquipoData equipo = equipoService.recuperarEquipo(id);
+            model.addAttribute("equipo", equipo);
+        } catch (Exception e) {
+            flash.addFlashAttribute("error", "Equipo no encontrado");
+            return "redirect:/equipos";
+        }
+
+        return "equipoEditar"; // Nombre de la vista HTML para editar
+    }
+
+    @PostMapping("/equipos/{id}/editar")
+    public String guardarEdicionEquipo(@PathVariable Long id, @ModelAttribute Equipo equipoForm, RedirectAttributes flash) {
+        Long usuarioId = managerUserSession.usuarioLogeado();
+        if (usuarioId == null) {
+            return "redirect:/login";
+        }
+
+        // El servicio comprobará si es administrador
+        equipoService.modificarNombreEquipo(usuarioId, id, equipoForm.getNombre());
+        flash.addFlashAttribute("mensaje", "Equipo modificado correctamente");
+        return "redirect:/equipos";
+    }
+
+    @GetMapping("/equipos/{id}/eliminar")
+    public String eliminarEquipo(@PathVariable Long id, RedirectAttributes flash) {
+        Long usuarioId = managerUserSession.usuarioLogeado();
+        if (usuarioId == null) {
+            return "redirect:/login";
+        }
+
+        // El servicio comprobará si es administrador
+        equipoService.eliminarEquipo(usuarioId, id);
+        flash.addFlashAttribute("mensaje", "Equipo eliminado correctamente");
         return "redirect:/equipos";
     }
 }
