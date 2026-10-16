@@ -50,7 +50,7 @@ public class EquipoService {
     @Transactional
     public void añadirUsuarioAEquipo(Long id, Long id1) {
         Equipo equipo = equipoRepository.findById(id).orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
-        Usuario usuario = usuarioRepository.findById(id1).orElseThrow(() -> new UsuarioServiceException("Usuario no encontrado"));
+        Usuario usuario = usuarioRepository.findById(id1).orElseThrow(() -> new EquipoServiceException("Usuario no encontrado"));
         equipo.addUsuario(usuario);
     }
 
