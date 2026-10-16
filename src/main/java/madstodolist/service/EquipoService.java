@@ -104,4 +104,38 @@ public class EquipoService {
         equipo.getUsuarios().remove(usuario);
     }
 
+    @Transactional
+    public void modificarNombreEquipo(Long usuarioId, Long equipoId, String nuevoNombre) {
+        // 1. Verificar que el usuario existe y es admin
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new EquipoServiceException("Usuario no encontrado"));
+
+        if (usuario.getAdmin() == null || !usuario.getAdmin()) {
+            throw new EquipoServiceException("El usuario no es administrador");
+        }
+
+        // 2. Buscar el equipo y cambiar el nombre
+        Equipo equipo = equipoRepository.findById(equipoId)
+                .orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
+
+        equipo.setNombre(nuevoNombre);
+    }
+
+    @Transactional
+    public void eliminarEquipo(Long usuarioId, Long equipoId) {
+        // 1. Verificar que el usuario existe y es admin
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new EquipoServiceException("Usuario no encontrado"));
+
+        if (usuario.getAdmin() == null || !usuario.getAdmin()) {
+            throw new EquipoServiceException("El usuario no es administrador");
+        }
+
+        // 2. Buscar el equipo y eliminarlo
+        Equipo equipo = equipoRepository.findById(equipoId)
+                .orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
+
+        equipoRepository.delete(equipo);
+    }
+
 }

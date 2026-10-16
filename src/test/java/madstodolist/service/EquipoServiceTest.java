@@ -1,6 +1,10 @@
 package madstodolist.service;
 
 import madstodolist.dto.UsuarioData;
+import madstodolist.model.Equipo;
+import madstodolist.model.Usuario;
+import madstodolist.repository.UsuarioRepository;
+import madstodolist.repository.equipoRepository;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import madstodolist.dto.EquipoData;
@@ -21,6 +25,12 @@ public class EquipoServiceTest {
 
     @Autowired
     UsuarioService usuarioService;
+
+    @Autowired
+    UsuarioRepository usuarioRepository;
+
+    @Autowired
+    equipoRepository equipoRepository;
 
     @Test
     public void crearRecuperarEquipo() {
@@ -111,6 +121,76 @@ public class EquipoServiceTest {
         // Creamos un equipo pero no un usuario y comprobamos que también se lanza una excepción
         EquipoData equipo = equipoService.crearEquipo("Proyecto 1");
         assertThatThrownBy(() -> equipoService.añadirUsuarioAEquipo(equipo.getId(), 1L))
+                .isInstanceOf(EquipoServiceException.class);
+    }
+
+    @Test
+    public void testModificarNombreEquipo() {
+        // 1. Creamos y guardamos un usuario administrador para la prueba usando setters
+        Usuario admin = new Usuario();
+        admin.setEmail("admin@ua.es");
+        admin.setPassword("1234");
+        // admin.setNombre("Admin"); // Descomenta si tu clase Usuario tiene setNombre
+        admin.setAdmin(true);
+        admin = usuarioRepository.save(admin);
+
+        // 2. Creamos y guardamos un equipo de prueba
+        Equipo equipo = equipoRepository.save(new Equipo("Equipo Antiguo"));
+
+        // 3. Ejecutamos el método del servicio usando los IDs reales recién generados
+        equipoService.modificarNombreEquipo(admin.getId(), equipo.getId(), "Nuevo Nombre Empresa");
+
+        // 4. Verificamos que se ha cambiado
+        EquipoData equipoActualizado = equipoService.recuperarEquipo(equipo.getId());
+        assertThat(equipoActualizado.getNombre()).isEqualTo("Nuevo Nombre Empresa");
+    }
+
+    @Test
+    public void testEliminarEquipo() {
+        // 1. Creamos usuario admin usando setters
+        Usuario admin = new Usuario();
+        admin.setEmail("admin@ua.es");
+        admin.setPassword("1234");
+        // admin.setNombre("Admin"); // Descomenta si tu clase Usuario tiene setNombre
+        admin.setAdmin(true);
+        admin = usuarioRepository.save(admin);
+
+        // 2. Creamos equipo
+        Equipo equipo = equipoRepository.save(new Equipo("Equipo a borrar"));
+
+        // 3. Eliminamos
+        equipoService.eliminarEquipo(admin.getId(), equipo.getId());
+
+        // 4. Comprobamos que ya no existe (lanza excepción al buscarlo)
+        assertThatThrownBy(() -> equipoService.recuperarEquipo(equipo.getId()))
+                .isInstanceOf(EquipoServiceException.class);
+    }
+
+    @Test
+    public void testModificarNombreEquipoNoEncontrado() {
+        // Usuario 1 (admin) intenta modificar un equipo que no existe (999L)
+        assertThatThrownBy(() -> equipoService.modificarNombreEquipo(1L, 999L, "Nombre"))
+                .isInstanceOf(EquipoServiceException.class);
+    }
+
+    @Test
+    public void testEliminarEquipoNoEncontrado() {
+        // Si intentamos borrar un equipo que no existe (ej. ID 999L) con un admin válido (ID 1L)
+        assertThatThrownBy(() -> equipoService.eliminarEquipo(1L, 999L))
+                .isInstanceOf(EquipoServiceException.class);
+    }
+
+    @Test
+    public void testModificarNombreEquipoNoAdmin() {
+        // Suponiendo que el usuario con ID 2 es un usuario normal (admin = false)
+        assertThatThrownBy(() -> equipoService.modificarNombreEquipo(2L, 1L, "Nuevo Nombre"))
+                .isInstanceOf(EquipoServiceException.class);
+    }
+
+    @Test
+    public void testEliminarEquipoNoAdmin() {
+        // Usuario normal intentando eliminar un equipo
+        assertThatThrownBy(() -> equipoService.eliminarEquipo(2L, 1L))
                 .isInstanceOf(EquipoServiceException.class);
     }
 }

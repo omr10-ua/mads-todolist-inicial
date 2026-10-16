@@ -124,4 +124,11 @@ public class EquipoTest {
         // THEN
         assertThat(equipos).hasSize(2);
     }
+
+    @Test
+    public void testCambiarNombreEquipo() {
+        Equipo equipo = new Equipo("Equipo Antiguo");
+        equipo.setNombre("Equipo Nuevo");
+        assertThat(equipo.getNombre()).isEqualTo("Equipo Nuevo");
+    }
 }
