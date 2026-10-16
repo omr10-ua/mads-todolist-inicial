@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments :: head (titulo='Nuevo Equipo')"></head>
+
+<body>
+<!-- Navbar -->
+<div th:replace="fragments :: navbar"></div>
+
+<div class="container" style="margin-top: 80px;">
+    <h2>Nuevo equipo</h2>
+
+    <!-- Formulario que conecta con el objeto 'equipo' del modelo -->
+    <form action="#" th:action="@{/nuevoEquipo}" th:object="${equipo}" method="post" class="mt-4">
+
+        <div class="form-group mb-3">
+            <label for="nombre">Nombre del equipo</label>
+            <!-- th:field vincula este input con la propiedad 'nombre' de la clase Equipo -->
+            <input type="text" id="nombre" th:field="*{nombre}" class="form-control" placeholder="Introduce el nombre del equipo" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar equipo</button>
+        <a th:href="@{/equipos}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
+</body>
+</html>
