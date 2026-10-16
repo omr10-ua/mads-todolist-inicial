@@ -1,0 +1,87 @@
+package madstodolist.service;
+
+import madstodolist.dto.EquipoData;
+import madstodolist.dto.UsuarioData;
+import madstodolist.model.Equipo;
+import madstodolist.model.Usuario;
+import madstodolist.repository.UsuarioRepository;
+import madstodolist.repository.equipoRepository;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class EquipoService {
+
+    @Autowired
+    private equipoRepository equipoRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Transactional
+    public EquipoData crearEquipo(String nombre) {
+        Equipo equipo = equipoRepository.save(new Equipo(nombre));
+        return modelMapper.map(equipo, EquipoData.class);
+    }
+
+    @Transactional(readOnly = true)
+    public EquipoData recuperarEquipo(Long id) {
+        Equipo equipo = equipoRepository.findById(id).orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
+
+        return modelMapper.map(equipo, EquipoData.class);
+    }
+
+    @Transactional(readOnly = true)
+    public List<EquipoData> findAllOrdenadoPorNombre() {
+        List<Equipo> equipos = equipoRepository.findAllOrdenadoPorNombre();
+        return equipos.stream()
+                .map(equipo -> modelMapper.map(equipo, EquipoData.class))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void añadirUsuarioAEquipo(Long id, Long id1) {
+        Equipo equipo = equipoRepository.findById(id).orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
+        Usuario usuario = usuarioRepository.findById(id1).orElseThrow(() -> new EquipoServiceException("Usuario no encontrado"));
+        equipo.addUsuario(usuario);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UsuarioData> usuariosEquipo(Long id) {
+        Equipo equipo = equipoRepository.findById(id).orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
+        // Hacemos uso de Java Stream API para mapear la lista de entidades a DTOs.
+        return equipo.getUsuarios().stream()
+                .map(usuario -> modelMapper.map(usuario, UsuarioData.class))
+                .collect(Collectors.toList());
+
+    }
+
+    @Transactional(readOnly = true)
+    public List<EquipoData> equiposUsuario(Long usuarioId) {
+        try {
+            // Usamos el método que busca equipos por ID de usuario
+            List<Equipo> equipos = equipoRepository.findByUsuariosId(usuarioId);
+            boolean UsuarioExiste = usuarioRepository.existsById(usuarioId);
+            if (!UsuarioExiste) {
+                throw new UsuarioServiceException("Usuario no encontrado");
+            }
+
+            return equipos.stream()
+                    .map(equipo -> modelMapper.map(equipo, EquipoData.class))
+                    .collect(Collectors.toList());
+
+        }catch (Exception e) {
+            throw new EquipoServiceException("No se encontro el equipo");
+        }
+    }
+
+
+}
